@@ -35,7 +35,7 @@ exports.loginController =async  (req,res)=>{
         if(existingUser){
             if(password == existingUser.password){
                 //generate token
-                const token = jwt.sign({userMail:existingUser.email,role:existingUser.role},process.env.JWTSECRET)
+                const token = jwt.sign({id:existingUser._id,userMail:existingUser.email,role:existingUser.role},process.env.JWTSECRET)
                 res.status(200).json({user:existingUser,token})
             }else{
                 res.status(409).json("Incorrect Email / Password")
@@ -61,7 +61,7 @@ exports.googleLoginController = async (req,res)=>{
         if(existingUser){
             //login
             //generate token
-            const token = jwt.sign({userMail:existingUser.email,role:existingUser.role},process.env.JWTSECRET)
+            const token = jwt.sign({id:existingUser._id,userMail:existingUser.email,role:existingUser.role},process.env.JWTSECRET)
                 res.status(200).json({user:existingUser,token})
         }else{
             //register
@@ -79,4 +79,25 @@ exports.googleLoginController = async (req,res)=>{
     // res.status(200).json("Request Recieved")
 }
 //user edit profile
+exports.updateUserProfileController = async(req,res)=>{
+    console.log("Inside updateUserProfileController");
+    //get id fro  req url
+    const userId = req.params.id
+    //get email
+    const email = req.payload.userMail
+    //get body text-content : username
+    const {username,password,bio,role,picture} = req.body
+    //get file data
+    const uploadImage = req.file?req.file.filename:picture
+    console.log(userId,email,username,password,bio,role,uploadImage);
+    try{
+        const updateUser = await users.findByIdAndUpdate(userId,{username,email,password,picture:uploadImage,bio,role},{new:true})
+        res.status(200).json(updateUser)
+
+    }catch(error){
+        console.log(error);
+        res.status(500).json(error)
+        
+    }
+}
 //admin edit profile

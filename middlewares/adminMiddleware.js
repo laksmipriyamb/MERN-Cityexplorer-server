@@ -4,7 +4,14 @@ const adminMiddleware = (req, res, next) => {
     console.log("Inside adminMiddleware");
     //logic to verify token
     //get token - req header
-    const token = req.headers['authorization'].split(" ")[1]
+const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json("Authorization header missing");
+  }
+
+  const token = authHeader.split(" ")[1];
+   
     //console.log(token);
     //verify token
     if (token) {

@@ -17,6 +17,8 @@ cityexplorerServer.use(express.json())
 
 //use router in server
 cityexplorerServer.use(router)
+//enable static files
+cityexplorerServer.use('/uploads',express.static('./uploads'))
 
 //create a port where server listen in web
 const PORT = 3000
