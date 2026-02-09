@@ -24,6 +24,18 @@ exports.postStoryController = async (req, res) => {
     }
 }
 
+// //get home stories
+// exports.getHomeStoriesController = async (req, res) => {
+//     console.log("Inside getHomeStoriesController");
+//     try {
+//         const homeStories = await stories.find()
+//         res.status(200).json(homeStories)
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json(error)
+//     }
+// }
+
 //get all stories for admin
 exports.getAllStoriesAdminController = async (req,res)=>{
     console.log("Inside getAllStoriesAdminController");
@@ -69,7 +81,34 @@ exports.getAllApprovedStoriesController = async (req, res) => {
       .populate("publisher", "username picture") // ✅ get user details
       .sort({ createdAt: -1 })
 
-    res.status(200).json(allStories)
+      const modifiedStories = allStories.map(story => ({
+      ...story._doc,
+      totalLikes: story.likes.length
+    }));
+
+    res.status(200).json(modifiedStories)
+  } catch (error) {
+    console.log(error)
+    res.status(500).json(error)
+  }
+}
+//get all pending stories
+exports.getAllPendingStoriesController = async (req, res) => {
+  console.log("Inside getAllPendingStoriesController");
+  const userMailId = req.payload.id
+
+  try {
+    const allStories = await stories
+      .find({ status:{$ne : "approved"},publisher : {$ne : userMailId} }) // 
+      .populate("publisher", "username picture") // 
+      .sort({ createdAt: -1 })
+
+      const modifiedStories = allStories.map(story => ({
+      ...story._doc,
+      totalLikes: story.likes.length
+    }));
+
+    res.status(200).json(modifiedStories)
   } catch (error) {
     console.log(error)
     res.status(500).json(error)
@@ -126,3 +165,39 @@ exports.deleteStoryController = async (req, res) => {
         res.status(500).json(error)
     }
 }
+
+
+
+// like  story
+exports.likeStoryController = async (req, res) => {
+  const userId = req.payload.id; 
+  const { storyId } = req.params;
+
+  try {
+    const story = await stories.findById(storyId);
+
+    if (!story) {
+      return res.status(404).json("Story not found");
+    }
+
+    const alreadyLiked = story.likes.includes(userId);
+
+    if (alreadyLiked) {
+      // unlike
+      story.likes.pull(userId);
+    } else {
+      // like
+      story.likes.push(userId);
+    }
+
+    await story.save();
+
+    res.status(200).json({
+      liked: !alreadyLiked,
+      totalLikes: story.likes.length
+    });
+
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+};

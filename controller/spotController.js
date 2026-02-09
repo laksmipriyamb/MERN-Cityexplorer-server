@@ -151,3 +151,53 @@ exports.deleteSpotController = async (req, res) => {
     }
 }
 
+//save spot controller
+exports.saveSpotController = async (req, res) => {
+  console.log("Inside saveSpotController");
+
+  const userId = req.payload.id
+  const { spotId } = req.body
+
+  try {
+    const spot = await spots.findById(spotId)
+
+    if (!spot) {
+      return res.status(404).json("Spot not found")
+    }
+
+    //unsave
+    if (spot.savedBy.includes(userId)) {
+      spot.savedBy = spot.savedBy.filter(
+        (id) => id.toString() !== userId
+      )
+      await spot.save()
+      return res.status(200).json({ message: "Spot removed from saved" })
+    }
+
+    // Save spot
+    spot.savedBy.push(userId)
+    await spot.save()
+
+    res.status(200).json({ message: "Spot saved successfully" })
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error)
+  }
+}
+
+//get saved spots
+exports.getSavedSpotsController = async (req, res) => {
+  const userId = req.payload.id
+
+  try {
+    const savedSpots = await spots.find({
+      savedBy: userId
+    })
+
+    res.status(200).json(savedSpots)
+  } catch (error) {
+    console.log(error);
+    res.status(500).json(error)
+  }
+}
