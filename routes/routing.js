@@ -91,7 +91,7 @@ router.get('/reviews/all',jwtMiddleware,reviewsController.getUserAllReviewsContr
 
 
 //delete review
-// router.delete('/reviews/:id',jwtMiddleware,reviewsController.deleteReviewController)
+router.delete('/reviews/:id',jwtMiddleware,reviewsController.deleteReviewController)
 
 
 //like ans unlike story

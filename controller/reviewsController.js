@@ -26,20 +26,20 @@ exports.addReviewsController = async (req, res) => {
 
 }
 
-// //delete review
-// exports.deleteReviewController = async (req, res) => {
-//     console.log("Inside deleteReviewController");
-//     //get _id of story
-//     const { id } = req.params
-//     try {
-//         //get  books from db 
-//         const reviewDetails = await reviews.findByIdAndDelete({ _id: id })
-//         res.status(200).json(reviewDetails)
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json(error)
-//     }
-// }
+//delete review
+exports.deleteReviewController = async (req, res) => {
+    console.log("Inside deleteReviewController");
+    //get _id of story
+    const { id } = req.params
+    try {
+        //get  books from db 
+        const reviewDetails = await reviews.findByIdAndDelete({ _id: id })
+        res.status(200).json(reviewDetails)
+    } catch (error) {
+        console.log(error);
+        res.status(500).json(error)
+    }
+}
 
 //get all reviews
 exports.getUserAllReviewsController = async (req, res) => {
@@ -86,3 +86,4 @@ exports.getMyReviewsController = async (req, res) => {
         res.status(500).json(error)
     }
 }
+
